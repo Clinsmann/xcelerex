@@ -12,7 +12,7 @@ cloudinary.config({
 const Storage = new CloudinaryStorage({
   cloudinary,
   params: {
-    folder: 'nest360/avatar',
+    folder: 'accelerex/avatar',
     allowedFormats: ['jpg', 'png', 'jpeg', 'gif'],
     public_id: async () => `${new Date().getTime()}-${uuidv4()}`,
     format: async (req: any, file: any) => {

@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 export class AppService {
   // eslint-disable-next-line class-methods-use-this
   getHello(): { name: string } {
-    return { name: 'Hello from nest360' };
+    return { name: 'Hello from accelerex' };
   }
 
   getHealth(): { message: string } {

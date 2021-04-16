@@ -1,4 +1,4 @@
-# Nest 360 Backend
+# accelerex Backend
 
 ## Getting Started
 

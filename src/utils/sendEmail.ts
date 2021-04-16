@@ -14,8 +14,8 @@ export const sendEmail = async (data: EmailFormat) => {
   sendSmtpEmail.htmlContent = template;
   sendSmtpEmail.to = [{ "email": to, "name": to }];
   sendSmtpEmail.headers = { "Content-Type": "application/json" };
-  sendSmtpEmail.sender = { "email": process.env.SENDINBLUE_SENDER_EMAIL, name: 'NEST 360' };
-  sendSmtpEmail.replyTo = { "email": process.env.SENDINBLUE_REPLY_TO_EMAIL, name: 'NEST 360' };
+  sendSmtpEmail.sender = { "email": process.env.SENDINBLUE_SENDER_EMAIL, name: 'ACCELEREX' };
+  sendSmtpEmail.replyTo = { "email": process.env.SENDINBLUE_REPLY_TO_EMAIL, name: 'ACCELEREX' };
 
   apiInstance.sendTransacEmail(sendSmtpEmail).then((data: any) => {
     Logger.log(`Email Message sent: %s ${JSON.stringify(data)}`, 'SendEmailService');

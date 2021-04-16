@@ -17,7 +17,7 @@ export const activateAccount = ({ userName, appName, activationUrl }: ActivateAc
   <head>
     <meta name="viewport" content="width=device-width" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Nest 360 Account Activation</title>
+    <title>Accelerex Account Activation</title>
     <style type="text/css">
       img {
         max-width: 100%;
@@ -190,7 +190,7 @@ export const activateAccount = ({ userName, appName, activationUrl }: ActivateAc
                     align="center"
                     valign="top"
                   >
-                    NEST 360
+                  ACCELEREX
                   </td>
                 </tr>
               </table>
@@ -300,7 +300,7 @@ export const resetPassword = ({ userName, appName, passwordResetUrl }: ResetPass
   <head>
     <meta name="viewport" content="width=device-width" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Nest 360 Account Activation</title>
+    <title>ACCELEREX Account Activation</title>
     <style type="text/css">
       img {
         max-width: 100%;
@@ -475,7 +475,7 @@ export const resetPassword = ({ userName, appName, passwordResetUrl }: ResetPass
                     align="center"
                     valign="top"
                   >
-                    NEST 360
+                  ACCELEREX
                   </td>
                 </tr>
               </table>
