@@ -9,7 +9,7 @@ const ORMConfig: TypeOrmModuleOptions = {
   logging: true,
   migrationsRun: true,
   entities: ['dist/**/*.entity{.ts,.js}'],
-  migrations: ['dist/**/*.migration{.ts,.js}'],
+  migrations: ['dist/migrations/*{.ts,.js}'],
   subscribers: ['dist/**/*.subscriber{.ts,.js}'],
   migrationsTableName: 'migrations_typeorm',
   cli: {

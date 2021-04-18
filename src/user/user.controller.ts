@@ -1,12 +1,12 @@
 import { Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
+import { StatusCodes } from 'http-status-codes';
 import {
   Get,
   Put,
   Req,
   Post,
   Body,
-  Param,
   Delete,
   HttpCode,
   UsePipes,
@@ -15,13 +15,10 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 
-
 import { UserService } from './user.service';
-import { StatusCodes } from 'http-status-codes';
-import { UpdateProfileDTO } from './updateProfile.dto';
-import { ResetPasswordDTO } from './resetPassword.dto';
-import { ChangePasswordDTO } from './changePassword.dto';
-import { ValidationPipe } from '../shared/validation.pipe';
+import { ValidationPipe } from '../pipes/validation.pipe';
+import { UpdateProfileDTO } from './dto/updateProfile.dto';
+import { ChangePasswordDTO } from './dto/changePassword.dto';
 
 @Controller()
 export class UserController {
@@ -63,15 +60,5 @@ export class UserController {
   @UseGuards(AuthGuard('jwt'))
   async deleteProfile(@Req() req: Request | any): Promise<any> {
     return await this.userService.deleteProfile(req.user.id);
-  }
-
-  @Post('reset-password/:token')
-  @HttpCode(StatusCodes.OK)
-  @UsePipes(new ValidationPipe())
-  async resetPassword(
-    @Body() resetPasswordDTO: ResetPasswordDTO,
-    @Param('token') token: string
-  ): Promise<any> {
-    return await this.userService.resetPassword(resetPasswordDTO, token);
   }
 }

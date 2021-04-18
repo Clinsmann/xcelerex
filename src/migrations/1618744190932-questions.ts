@@ -1,16 +1,16 @@
 import { MigrationInterface, QueryRunner, Table } from "typeorm";
 
-export class Reviews1614249984022 implements MigrationInterface {
+export class questions1618744190932 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'reviews',
+        name: 'questions',
         columns: [
-          { name: 'id', type: 'uuid', isPrimary: true },
+          { name: 'id', type: 'varchar', isPrimary: true, generationStrategy: 'uuid' },
           { name: 'userId', type: 'uuid' },
-          { name: 'wpId', type: 'varchar' },
-          { name: 'rating', type: 'varchar' },
+          { name: 'title', type: 'varchar' },
+          { name: 'question', type: 'varchar' },
           { name: 'createdAt', type: 'timestamp', default: 'now()', isNullable: true },
           { name: 'updatedAt', type: 'timestamp', default: 'now()', isNullable: true },
         ],

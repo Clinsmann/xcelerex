@@ -6,13 +6,13 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { AppController } from './app.controller';
-import { ReviewModule } from './review/review.module';
+import { QuestionModule } from './question/question.module';
 
 @Module({
   imports: [
     UserModule,
     AuthModule,
-    ReviewModule,
+    QuestionModule,
     TypeOrmModule.forRoot(ORMConfig),
   ],
   controllers: [AppController],

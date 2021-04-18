@@ -1,24 +1,21 @@
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
-import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
 
-import { UserEntity } from './user.entity';
-import { LoginDTO } from '../auth/login.dto';
+import { LoginDTO } from '../auth/dto/login.dto';
 import { tokenTypes } from 'src/utils/constants';
 import { TokenTypes } from '../utils/getTemplate';
-import { RegisterDTO } from '../auth/register.dto';
-import { UpdateProfileDTO } from './updateProfile.dto';
-import { ResetPasswordDTO } from './resetPassword.dto';
-import { ChangePasswordDTO } from './changePassword.dto';
+import { UserEntity } from './entities/user.entity';
+import { RegisterDTO } from '../auth/dto/register.dto';
+import { UpdateProfileDTO } from './dto/updateProfile.dto';
+import { ChangePasswordDTO } from './dto/changePassword.dto';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
-    private readonly jwtService: JwtService
   ) { }
 
   async create(registerDTO: RegisterDTO, token: string) {
@@ -63,19 +60,6 @@ export class UserService {
       password: await bcrypt.hash(newPassword, 12),
     });
     return this.sanitizeUser(await this.userRepository.save(tempUser));
-  }
-
-  async resetPassword({ email, newPassword }: ResetPasswordDTO, token: string) {
-    const user = await this.userRepository.findOne({ email: email.toLowerCase() });
-    const decodedToken = await this.jwtService.verifyAsync(token);
-    if (!user) throw new BadRequestException('Account does not exist');
-    if (token !== user.token) throw new BadRequestException('Invalid token');
-    if (decodedToken.email != user.email)
-      throw new BadRequestException('Invalid credentials');
-    const password = await bcrypt.hash(newPassword, 12);
-    return this.sanitizeUser(
-      await this.userRepository.save({ ...user, password, token: '' })
-    );
   }
 
   async updateProfile(updateProfileDTO: UpdateProfileDTO) {

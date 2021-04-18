@@ -1,13 +1,14 @@
 import { StatusCodes } from 'http-status-codes';
 import { Controller, Post, Body, UsePipes, Param, Get, HttpCode } from '@nestjs/common';
 
-import { LoginDTO } from './login.dto';
-import { RegisterDTO } from './register.dto';
+import { LoginDTO } from './dto/login.dto';
 import { AuthService } from './auth.service';
-import { SendTokenDTO } from './sendToken.dto';
 import { tokenTypes } from '../utils/constants';
+import { RegisterDTO } from './dto/register.dto';
 import { TokenTypes } from 'src/utils/getTemplate';
-import { ValidationPipe } from '../shared/validation.pipe';
+import { SendTokenDTO } from './dto/sendToken.dto';
+import { ValidationPipe } from '../pipes/validation.pipe';
+import { ResetPasswordDTO } from './dto/resetPassword.dto';
 
 @Controller()
 export class AuthController {
@@ -43,5 +44,12 @@ export class AuthController {
   @UsePipes(new ValidationPipe())
   async forgotPassword(@Body() forgotPasswordDTO: SendTokenDTO): Promise<any> {
     return await this.authService.sendToken(forgotPasswordDTO, tokenTypes.PASSWORD_RESET as TokenTypes);
+  }
+
+  @Post('reset-password/:token')
+  @HttpCode(StatusCodes.OK)
+  @UsePipes(new ValidationPipe())
+  async resetPassword(@Body() resetPasswordDTO: ResetPasswordDTO, @Param('token') token: string): Promise<any> {
+    return await this.authService.resetPassword(resetPasswordDTO, token);
   }
 }
