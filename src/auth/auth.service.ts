@@ -1,15 +1,12 @@
 import { v4 as uuidv4 } from 'uuid';
 import { JwtService } from '@nestjs/jwt';
 import { SignOptions } from 'jsonwebtoken';
-import {
-  Injectable,
-  BadRequestException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
 
 import { LoginDTO } from './login.dto';
 import { RegisterDTO } from './register.dto';
 import { SendTokenDTO } from './sendToken.dto';
+import { tokenTypes } from '../utils/constants';
 import { TokenTypes } from '../utils/getTemplate';
 import { UserService } from '../user/user.service';
 
@@ -28,29 +25,29 @@ export class AuthService {
   async register(registerDTO: RegisterDTO) {
     const id = uuidv4();
     registerDTO.id = id;
-    const activation_token = await this.generateToken({
-      id,
-      email: registerDTO.email,
-    });
-    const user = await this.userService.create(registerDTO, activation_token);
-    return { user };
+    const token = await this.generateToken({ id, email: registerDTO.email });
+    await this.userService.create(registerDTO, token);
+    return { activationUri: `${process.env.BACKEND_HOST}:${process.env.PORT}/activate-account/${token}` };
   }
 
   async activateAccount(token: string): Promise<any> {
     const data = await this.verifyToken(token);
     if (!data) throw new BadRequestException('Confirmation Error');
-    const user = await this.userService.doActivateAccount(data.id);
-    return { user, message: 'account activated' };
+    await this.userService.doActivateAccount(data.id);
+    return { message: 'account activated' };
   }
 
   async sendToken({ email }: SendTokenDTO, type: TokenTypes): Promise<any> {
     const user = await this.userService.findByField('email', email, false);
     if (!user) throw new BadRequestException('Account does not exist');
-    if (type === 'ACCOUNT_ACTIVATION' && user.isActivated)
+    if (type === tokenTypes.ACCOUNT_ACTIVATION && user.isActivated)
       throw new BadRequestException('Account already active');
-    if (type === 'PASSWORD_RESET' && !user.isActivated)
+    if (type === tokenTypes.PASSWORD_RESET && !user.isActivated)
       throw new BadRequestException('Kindly activate account.');
-    const token = await this.generateToken({ id: user.id, email, type });
+    const token = await this.generateToken(
+      { id: user.id, email, type },
+      { expiresIn: process.env.UTILITY_JWT_EXPIRY }
+    );
     return await this.userService.doSendToken(user, token, type);
   }
 

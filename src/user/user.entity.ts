@@ -3,7 +3,7 @@ import { Entity, Column, BeforeInsert } from 'typeorm';
 
 import { BaseEntity } from '../base-entity';
 
-@Entity()
+@Entity('users')
 export class UserEntity extends BaseEntity {
   @Column()
   firstName: string;
@@ -15,28 +15,7 @@ export class UserEntity extends BaseEntity {
   email: string;
 
   @Column()
-  country: string;
-
-  @Column()
-  role: string;
-
-  @Column({ nullable: true })
-  jobTitle: string;
-
-  @Column({ nullable: true })
-  institution: string;
-
-  @Column()
   password: string;
-
-  @Column({ nullable: true })
-  profileImage: string;
-
-  @Column({ type: 'boolean' })
-  agreeToTerms: boolean;
-
-  @Column({ type: 'boolean', nullable: true })
-  getUpdates: boolean;
 
   @Column({ type: 'boolean', default: false })
   isActivated: boolean;

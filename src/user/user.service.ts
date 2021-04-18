@@ -2,27 +2,16 @@ import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  Logger,
-  Injectable,
-  HttpStatus,
-  HttpException,
-  BadRequestException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
 
-import { sendEmail } from '../utils/sendEmail';
 import { UserEntity } from './user.entity';
 import { LoginDTO } from '../auth/login.dto';
+import { tokenTypes } from 'src/utils/constants';
+import { TokenTypes } from '../utils/getTemplate';
 import { RegisterDTO } from '../auth/register.dto';
 import { UpdateProfileDTO } from './updateProfile.dto';
 import { ResetPasswordDTO } from './resetPassword.dto';
 import { ChangePasswordDTO } from './changePassword.dto';
-import {
-  TokenTypes,
-  EmailPayload,
-  getEmailPayload,
-} from '../utils/getTemplate';
 
 @Injectable()
 export class UserService {
@@ -36,12 +25,7 @@ export class UserService {
     const { email } = registerDTO;
     const existingUser = await this.findByField('email', email.toLowerCase());
     if (existingUser) throw new BadRequestException('User already exists');
-    const newUser = this.userRepository.create({
-      ...registerDTO,
-      token,
-      email: email.toLowerCase(),
-    });
-    this.doSendMail({ type: 'ACCOUNT_ACTIVATION', token, data: registerDTO });
+    const newUser = this.userRepository.create({ ...registerDTO, token, email: email.toLowerCase() });
     return this.sanitizeUser(await this.userRepository.save(newUser));
   }
 
@@ -57,38 +41,20 @@ export class UserService {
 
   async doActivateAccount(id: string) {
     const user = await this.userRepository.findOne({ id });
-    const updatedUser = await this.userRepository.save({
-      ...user,
-      token: '',
-      isActivated: true,
-    });
-    this.doSendMail({ type: 'ACCOUNT_ACTIVATED', data: user });
+    const updatedUser = await this.userRepository.save({ ...user, token: '', isActivated: true });
     return this.sanitizeUser(updatedUser);
   }
 
   async doSendToken(user: UserEntity, token: string, type: TokenTypes) {
+    let path: string;
     await this.userRepository.save({ ...user, token });
-    const msgCaption: string = type.split('_').join(' ').toLowerCase();
-    try {
-      this.doSendMail({ type, token, data: user });
-      return { message: `${msgCaption} link has been sent to your email` };
-    } catch (error) {
-      Logger.log(
-        `Error sending ${msgCaption} link to ${user.email}. ${error} `,
-        'UserService : doSendToken Method'
-      );
-      throw new HttpException(
-        `Error sending ${msgCaption} link. Try again later`,
-        HttpStatus.SERVICE_UNAVAILABLE
-      );
-    }
+    if (type === tokenTypes.PASSWORD_RESET) path = "reset-password";
+    if (type === tokenTypes.ACCOUNT_ACTIVATION) path = "activate-account";
+    console.log({ type, path });
+    return { uri: `${process.env.BACKEND_HOST}:${process.env.PORT}/${path}/${token}` };
   }
 
-  async changePassword({
-    email,
-    newPassword,
-    currentPassword,
-  }: ChangePasswordDTO) {
+  async changePassword({ email, newPassword, currentPassword }: ChangePasswordDTO) {
     const user = await this.userRepository.findOne({ email: email.toLowerCase() });
     const passwordMatch = await bcrypt.compare(currentPassword, user.password);
     if (!passwordMatch) throw new UnauthorizedException('Invalid credentials');
@@ -116,17 +82,7 @@ export class UserService {
     return this.sanitizeUser(await this.userRepository.save({ ...updateProfileDTO }));
   }
 
-  async upload(file: any, id: string) {
-    const user = await this.userRepository.findOne({ id });
-    if (user.profileImage) this.deleteProfileImage(user.profileImage, id);
-    return this.sanitizeUser(await this.userRepository.save({ ...user, profileImage: file.path }));
-  }
-
-  async findByField(
-    field: string,
-    value: string,
-    doSanitized: boolean = true
-  ): Promise<any> {
+  async findByField(field: string, value: string, doSanitized: boolean = true): Promise<any> {
     const user = await this.userRepository.findOne({ [field]: value });
     if (user) return !doSanitized ? user : this.sanitizeUser(user);
     return null;
@@ -136,12 +92,8 @@ export class UserService {
     return sanitized;
   }
 
-  async doSendMail(data: EmailPayload) {
-    sendEmail(getEmailPayload(data));
-  }
-
-  async deleteProfileImage(path: string, userId: string) {
-    console.log('deleting profile picture...');
-    // todo delete image from cloudinary
+  async deleteProfile(id: string) {
+    await this.userRepository.delete({ id });
+    return { message: "account deleted." };
   }
 }
