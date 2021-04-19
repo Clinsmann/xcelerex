@@ -20,7 +20,7 @@ export class CommentService {
 
   async create(createCommentDto: CreateCommentDto) {
     const question = await this.questionRepository.findOne(createCommentDto.questionId);
-    if (!question) throw new NotFoundException("Comment " + ReasonPhrases.NOT_FOUND);
+    if (!question) throw new NotFoundException("Question " + ReasonPhrases.NOT_FOUND);
     const comment = this.commentRepository.create({ ...createCommentDto, id: uuidv4() });
     const createdComment = await this.commentRepository.save(comment);
     return { createdComment };
