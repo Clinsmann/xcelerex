@@ -7,7 +7,7 @@ export class questions1618744190932 implements MigrationInterface {
       new Table({
         name: 'questions',
         columns: [
-          { name: 'id', type: 'varchar', isPrimary: true, generationStrategy: 'uuid' },
+          { name: 'id', type: 'uuid', isPrimary: true, generationStrategy: 'uuid' },
           { name: 'userId', type: 'uuid' },
           { name: 'title', type: 'varchar' },
           { name: 'question', type: 'varchar' },

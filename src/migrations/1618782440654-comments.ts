@@ -1,4 +1,4 @@
-import { MigrationInterface, QueryRunner, Table } from "typeorm";
+import { MigrationInterface, QueryRunner, Table, TableForeignKey } from "typeorm";
 
 export class comments1618782440654 implements MigrationInterface {
 
@@ -7,7 +7,7 @@ export class comments1618782440654 implements MigrationInterface {
       new Table({
         name: 'comments',
         columns: [
-          { name: 'id', type: 'varchar', isPrimary: true, generationStrategy: 'uuid' },
+          { name: 'id', type: 'uuid', isPrimary: true, generationStrategy: 'uuid' },
           { name: 'userId', type: 'uuid' },
           { name: 'questionId', type: 'uuid' },
           { name: 'comment', type: 'varchar' },
@@ -17,6 +17,13 @@ export class comments1618782440654 implements MigrationInterface {
       }),
       true
     );
+
+    await queryRunner.createForeignKey("comments", new TableForeignKey({
+      columnNames: ["questionId"],
+      referencedColumnNames: ["id"],
+      referencedTableName: "questions",
+      onDelete: "CASCADE"
+    }));
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

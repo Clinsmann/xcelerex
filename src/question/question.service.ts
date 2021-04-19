@@ -22,12 +22,12 @@ export class QuestionService {
   }
 
   async findAll() {
-    const [questions, total] = await this.questionRepository.findAndCount({ take: 20 });
+    const [questions, total] = await this.questionRepository.findAndCount({ take: 20, relations: ['comments'] });
     return { questions, total };
   }
 
   async findOne(id: string) {
-    const question = await this.questionRepository.find({ id });
+    const question = await this.questionRepository.findOne({ where: { id }, relations: ['comments'] });
     return { question };
   }
 
