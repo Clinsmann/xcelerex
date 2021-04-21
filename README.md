@@ -18,12 +18,6 @@ Second, create your `.env` file:
 cp .env.example .env
 ```
 
-Third, set up the infrastructural dependencies with Docker Compose:
-
-```bash
-docker-compose up -d
-```
-
 Third, run the development server:
 
 ```bash
@@ -43,11 +37,12 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
-Open [http://localhost:4500](http://localhost:4000) in Postman or whatever tool you use to interact with a REST API.
+Open [http://localhost:4501](http://localhost:4501) in Postman or whatever tool you use to interact with a REST API.
 
 ## Learn More
 
 This project was bootstrapped with NestJS framework:
 
 - [NestJS Documentation](https://docs.nestjs.com) - learn about Next.js features and API.
+
 # xcelerex

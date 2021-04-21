@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Repository } from 'typeorm';
+import { getRepository, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 
@@ -22,13 +22,36 @@ export class QuestionService {
   }
 
   async findAll() {
-    const [questions, total] = await this.questionRepository.findAndCount({ take: 20, relations: ['comments', 'ratings'] });
+    const [questions, total] = await this.questionRepository
+      .findAndCount({ take: 20, relations: ['comments', 'ratings'] });
     return { questions, total };
   }
 
   async findOne(id: string) {
-    const question = await this.questionRepository.findOne({ where: { id }, relations: ['comments', 'ratings'] });
-    return { question };
+    let upVote = 0, downVote = 0;
+    const res = await getRepository(QuestionEntity)
+      .createQueryBuilder('questions')
+      .where({ id })
+      .leftJoinAndSelect("questions.comments", "comment")
+      .leftJoinAndSelect("questions.ratings", "rating")
+      .select([
+        'questions.id',
+        'questions.title',
+        'questions.question',
+        'comment.id',
+        'comment.comment',
+        'rating.id',
+        'rating.rating'
+      ])
+      .getOne();
+
+    res.ratings.forEach(({ rating }: any) => {
+      if (!!rating) upVote++;
+      if (!rating) downVote++;
+    });
+
+    const { ratings, comments, ...questionData }: any = res;
+    return { question: questionData, comments, votes: { upVote, downVote } };
   }
 
   async update(id: string, updateQuestionDto: UpdateQuestionDto, userId: string) {
